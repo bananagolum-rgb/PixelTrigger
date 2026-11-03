@@ -43,9 +43,9 @@
 static int   CFG_ZONE_W         = 40;      // capture width  (px)
 static int   CFG_ZONE_H         = 40;      // capture height (px)
 
-static BYTE  CFG_R              = 255;     // target Red
-static BYTE  CFG_G              = 0;       // target Green
-static BYTE  CFG_B              = 0;       // target Blue
+static int   CFG_R              = 255;     // target Red   (0-255)
+static int   CFG_G              = 0;       // target Green (0-255)
+static int   CFG_B              = 0;       // target Blue  (0-255)
 static int   CFG_TOLERANCE      = 20;      // per-channel ±
 
 static int   CFG_SCAN_MS        = 1;       // ms between scans (0 = busy)
@@ -109,7 +109,7 @@ static void conInit()
         g_conH = csbi.srWindow.Bottom - csbi.srWindow.Top  + 1;
     }
     // Ensure buffer >= window
-    COORD sz{ (SHORT)max(g_conW, 120), (SHORT)max(g_conH, 30) };
+    COORD sz{ (SHORT)std::max(g_conW, 120), (SHORT)std::max(g_conH, 30) };
     SetConsoleScreenBufferSize(g_hOut, sz);
 
     SetConsoleTextAttribute(g_hOut, CON_GREY);
@@ -262,11 +262,11 @@ static void humanTap(WORD vk)
     sendKey(vk, false);
 }
 
-static inline bool colourMatch(BYTE r, BYTE g, BYTE b)
+static inline bool colourMatch(int r, int g, int b)
 {
-    return (abs((int)r - CFG_R) <= CFG_TOLERANCE) &&
-           (abs((int)g - CFG_G) <= CFG_TOLERANCE) &&
-           (abs((int)b - CFG_B) <= CFG_TOLERANCE);
+    return (std::abs(r - CFG_R) <= CFG_TOLERANCE) &&
+           (std::abs(g - CFG_G) <= CFG_TOLERANCE) &&
+           (std::abs(b - CFG_B) <= CFG_TOLERANCE);
 }
 
 struct CaptureCtx
@@ -348,9 +348,9 @@ static void triggerThread()
         for (int i = 0, n = zw * zh; i < n && !found; ++i)
         {
             DWORD px = ctx.buf[i];
-            BYTE b = (BYTE)( px        & 0xFF);
-            BYTE g = (BYTE)((px >>  8) & 0xFF);
-            BYTE r = (BYTE)((px >> 16) & 0xFF);
+            int b = (int)( px        & 0xFF);
+            int g = (int)((px >>  8) & 0xFF);
+            int r = (int)((px >> 16) & 0xFF);
             if (colourMatch(r, g, b)) found = true;
         }
 

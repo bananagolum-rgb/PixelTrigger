@@ -1,1 +1,20 @@
-name: Build on: push jobs: build: runs-on: windows-latest steps: - uses: actions/checkout@v4 - uses: ilammy/msvc-dev-cmd@v1 - run: cl /O2 /std:c++17 /EHsc PixelTrigger.cpp /link user32.lib gdi32.lib - uses: actions/upload-artifact@v4 with: name: PixelTrigger path: PixelTrigger.exe
+name: Build
+on: [push]
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup MSVC
+        uses: ilammy/msvc-dev-cmd@v1
+
+      - name: Compile
+        run: cl /O2 /std:c++17 /EHsc PixelTrigger.cpp /link user32.lib gdi32.lib
+
+      - name: Upload EXE
+        uses: actions/upload-artifact@v4
+        with:
+          name: PixelTrigger
+          path: PixelTrigger.exe
